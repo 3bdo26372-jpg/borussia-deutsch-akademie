@@ -38,3 +38,10 @@ test("all original dialogues are available with both roles", () => {
     assert.ok(scenario.lines.some((line) => line.speaker === "Mitarbeiter"));
   }
 });
+
+test("every vocabulary situation contains two clear speaker turns", () => {
+  const speakerPattern = /(Kunde|Mitarbeiter|Interviewer|Bewerber|Prüfer|Teilnehmer):/gu;
+  for (const item of vocabulary) {
+    assert.equal([...item.situationDe.matchAll(speakerPattern)].length, 2, `${item.word} needs two speaker turns`);
+  }
+});

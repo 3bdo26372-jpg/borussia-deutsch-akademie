@@ -129,7 +129,11 @@ const coreLexicon: Record<string, string> = {
   entschuldigung: "اعتذار", geld: "مال", hemd: "قميص", "it-abteilung": "قسم تقنية المعلومات", karton: "صندوق كرتون", nein: "لا", paypal: "باي بال", produkt: "منتج", werktage: "أيام عمل", woche: "أسبوع",
   bestellt: "طلب", bezahlen: "يدفع", beziehungsweise: "أو", bis: "حتى", blaues: "أزرق", eigenen: "الخاصة بك", einzeln: "بشكل منفرد", einzelne: "منفردة", endlich: "أخيرًا", erneut: "مجدّدًا", genutzt: "استخدم",
   gestern: "أمس", kommt: "يصل", komplette: "كاملة", kostenlos: "مجاني", laut: "بصوت عالٍ", leid: "آسف", leider: "للأسف", liegt: "يرجع سببه", morgen: "غدًا", normalerweise: "عادةً", per: "عن طريق", rotes: "أحمر", sieben: "سبعة",
-  sollte: "كان من المفترض", tut: "يفعل", unfähig: "غير كفؤ", verfügbar: "متاح", vorliegt: "موجود", völlig: "تمامًا", wieder: "مرة أخرى",
+  sollte: "كان من المفترض", tut: "يفعل", unfähig: "غير كفؤ", verfügbar: "متاح", vorliegt: "موجود", völlig: "تمامًا", wieder: "مرة أخرى", prüfer: "ممتحن", teilnehmer: "مشارك",
+  auskunft: "إفادة", bedeutung: "معنى", bedingungen: "شروط", diskussion: "نقاش", erzählen: "يحكي", ordnung: "نظام / حسنًا", alles: "كل شيء", analysieren: "يحلّل", belegen: "يثبت",
+  benötige: "أحتاج", benötigen: "يحتاجون", beschreibe: "أصف", bleibt: "يبقى", da: "متاح", daraus: "من ذلك", differenziert: "بشكل متوازن", eindeutig: "بوضوح", einfachen: "بسيطة", eingesetzt: "استخدم",
+  erfordert: "يتطلّب", ergänze: "أضيف", erreichten: "المُحقّقة", festzulegen: "لتحديد", getesteten: "المُجرّبة", gleich: "حالًا", konkret: "بشكل محدد", kontrolliere: "أتحقق", korrekt: "صحيح",
+  müssen: "يجب", rund: "حول", seit: "منذ", tritt: "يظهر", verbinde: "أربط", verbindliche: "موثوقة",
 };
 
 const vocabularyTokenTranslations = new Map<string, string>();
@@ -404,6 +408,23 @@ function DialoguesSection() {
   </div>;
 }
 
+function parseSituationDialogue(text: string) {
+  const speakerPattern = /(Kunde|Mitarbeiter|Interviewer|Bewerber|Prüfer|Teilnehmer):\s*/gu;
+  const matches = [...text.matchAll(speakerPattern)];
+  if (!matches.length) return [{ speaker: "Gespräch", text }];
+  return matches.map((match, index) => ({
+    speaker: match[1],
+    text: text.slice((match.index ?? 0) + match[0].length, matches[index + 1]?.index ?? text.length).trim(),
+  }));
+}
+
+function SituationDialogue({ text }: { text: string }) {
+  const turns = parseSituationDialogue(text);
+  return <div className="situation-dialogue">{turns.map((turn, index) => <div className={`situation-turn ${index % 2 === 0 ? "situation-turn-a" : "situation-turn-b"}`} key={`${turn.speaker}-${index}`}>
+    <span aria-hidden="true">{turn.speaker.slice(0, 1)}</span><div><small><GermanText>{turn.speaker}</GermanText></small><p className="de" dir="ltr"><GermanText>{turn.text}</GermanText></p></div><AudioButton text={turn.text} label={`${turn.speaker} anhören`}/>
+  </div>)}</div>;
+}
+
 function WordModal({ word, onClose }: { word: Vocabulary; onClose: () => void }) {
   const dialogRef = useRef<HTMLElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
@@ -434,7 +455,7 @@ function WordModal({ word, onClose }: { word: Vocabulary; onClose: () => void })
   return <div className="modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}><article ref={dialogRef} className="word-modal" role="dialog" aria-modal="true" aria-labelledby={`word-title-${word.id}`}><button ref={closeRef} className="modal-close" onClick={onClose} aria-label="Wortdetails schließen">×</button>
     <div className="word-modal-head"><span><GermanText>{`${word.type} · ${categoryName(word.category)}`}</GermanText></span><div><h1 id={`word-title-${word.id}`} className="de" dir="ltr"><GermanText>{word.word}</GermanText></h1><AudioButton text={word.word}/></div></div>
     <section><small><GermanText>BEISPIEL</GermanText></small><div className="example-box"><div><p className="de" dir="ltr"><GermanText>{word.exampleDe}</GermanText></p><AudioButton text={word.exampleDe}/></div></div></section>
-    <section><small><GermanText>IM GESPRÄCH</GermanText></small><div className="situation-box"><p className="de" dir="ltr"><GermanText>{word.situationDe}</GermanText></p><AudioButton text={word.situationDe} label="Situation anhören"/></div></section>
-    <button className="complete-button" onClick={onClose}>Wort schließen ✓</button>
+    <section><div className="word-section-heading"><small><GermanText>IM GESPRÄCH</GermanText></small><AudioButton text={word.situationDe} label="Gespräch komplett anhören"/></div><SituationDialogue text={word.situationDe}/></section>
+    <div className="word-modal-footer"><p><GermanText>Wort antippen: übersetzen oder anhören.</GermanText></p><button className="complete-button" onClick={onClose}>Schließen ✓</button></div>
   </article></div>;
 }

@@ -75,6 +75,9 @@ test("word details are an accessible modal", async ({ page }) => {
   await page.getByRole("button", { name: /Details öffnen/ }).first().click();
   const dialog = page.getByRole("dialog", { name: /die Bestellung/ });
   await expect(dialog).toBeVisible();
+  await expect(dialog.locator(".situation-turn")).toHaveCount(2);
+  await expect(dialog.getByRole("button", { name: "Gespräch komplett anhören" })).toBeVisible();
+  await expect(dialog.getByRole("button", { name: "Schließen ✓" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Wortdetails schließen" })).toBeFocused();
   await page.keyboard.press("Escape");
   await expect(dialog).toBeHidden();
