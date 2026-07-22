@@ -1,16 +1,16 @@
 # Borussia Deutsch Akademie
 
-An Arabic-first interactive German course for job interviews and customer service, built from a 12-PDF study collection.
+A static German interview trainer focused on interview questions and practical vocabulary.
 
 ## Included
 
-- 12 structured B1–B2 lessons
-- interview question bank with adaptable model answers
-- 160+ clickable vocabulary entries with Arabic meaning, examples and scenarios
-- customer-service role plays
-- German text-to-speech
-- translations shown in a small tooltip only on hover, keyboard focus, or touch
-- responsive Arabic/German interface with a mobile-first interaction layer
+- 55 interview questions with adaptable model answers
+- a three-minute self-introduction that only needs the learner's name
+- 160+ interactive vocabulary entries with Arabic meanings and German examples
+- tap or click any German learning word to translate that one word or hear it pronounced
+- explicit German text-to-speech voice selection
+- German-only interface; Arabic appears only after requesting a translation
+- responsive mobile-first interface
 - 100% static frontend: no API, server functions, database, accounts, or progress tracking
 
 ## Run locally
