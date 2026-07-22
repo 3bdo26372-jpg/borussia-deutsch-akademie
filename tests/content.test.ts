@@ -25,8 +25,8 @@ test("every vocabulary item has unique word-specific practice", () => {
   assert.equal(new Set(vocabulary.map((item) => item.situationDe)).size, vocabulary.length);
   for (const item of vocabulary) {
     assert.ok(item.word && item.arabic && item.type && item.category);
-    assert.ok(item.exampleDe.includes(item.word), `${item.word} missing from its example`);
-    assert.ok(item.situationDe.includes(item.word), `${item.word} missing from its situation`);
+    assert.doesNotMatch(item.exampleDe, /[„“]/u, `${item.word} uses quotation marks in its example`);
+    assert.doesNotMatch(item.situationDe, /[„“]/u, `${item.word} uses quotation marks in its situation`);
   }
 });
 

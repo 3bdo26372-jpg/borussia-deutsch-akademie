@@ -134,6 +134,17 @@ const coreLexicon: Record<string, string> = {
   benötige: "أحتاج", benötigen: "يحتاجون", beschreibe: "أصف", bleibt: "يبقى", da: "متاح", daraus: "من ذلك", differenziert: "بشكل متوازن", eindeutig: "بوضوح", einfachen: "بسيطة", eingesetzt: "استخدم",
   erfordert: "يتطلّب", ergänze: "أضيف", erreichten: "المُحقّقة", festzulegen: "لتحديد", getesteten: "المُجرّبة", gleich: "حالًا", konkret: "بشكل محدد", kontrolliere: "أتحقق", korrekt: "صحيح",
   müssen: "يجب", rund: "حول", seit: "منذ", tritt: "يظهر", verbinde: "أربط", verbindliche: "موثوقة",
+  angabe: "معلومة / بيان", anhand: "استنادًا إلى", austausch: "استبدال", bank: "بنك", bestellübersicht: "ملخص الطلب", eingang: "وصول", eltern: "الوالدان", entwicklung: "تطور",
+  fachkenntnisse: "معرفة تخصصية", filiale: "فرع", formular: "نموذج", freitag: "الجمعة", frist: "مهلة", gerät: "جهاز", juni: "يونيو", kartenlimit: "حد البطاقة",
+  kaufbeleg: "إيصال الشراء", kaufpreis: "سعر الشراء", kinder: "أطفال", lebens: "الحياة", leitung: "الإدارة", liefertermin: "موعد التسليم", lieferumfang: "محتويات الشحنة", monats: "الشهر",
+  prüfung: "فحص", rückgabefrist: "مهلة الإرجاع", solange: "طالما", termin: "موعد", uhr: "الساعة", vertrag: "عقد", wartezeit: "وقت الانتظار", abgebucht: "تم خصمه",
+  abgelaufen: "انتهت", ablenken: "يشتت", aktuellem: "الحالي", beanspruchen: "يستغرق", begrenzt: "محدود", begründe: "أبرر", berücksichtige: "أراعي", berücksichtigt: "يراعي",
+  buchen: "يقيّد / يخصم", drei: "ثلاثة", dreißigste: "الثلاثون", eigene: "خاصة", einschalten: "يشغّل", erbracht: "تم تقديمه", erledige: "أنجز", erläutere: "أوضح",
+  erreicht: "يصل", erst: "فقط", feste: "ثابتة", frankierte: "مدفوع البريد", geht: "يتعلق / يسير", gelieferte: "المُسلَّم", geplante: "المخطط", gerade: "الآن",
+  gesetzlichen: "القانونية", hohen: "المرتفع", innerhalb: "خلال", intensive: "مكثف", jeder: "كل", kläre: "أوضح / أحل", konnte: "استطاع", kosten: "تكلّف",
+  lege: "أضع", letzte: "الماضي", lässt: "يمكن / يدع", meist: "غالبًا", nützlich: "مفيد", organisiere: "أنظم", positiven: "الإيجابية", schalte: "أعطّل / أشغّل",
+  scheint: "يبدو", spätestens: "على أقصى تقدير", ständig: "باستمرار", stört: "يزعج", tägliche: "يومية", unbenutzten: "غير المستخدم", unten: "أسفل", vereinbarten: "المتفق عليه",
+  verschlossen: "مغلق", vertiefen: "يعمّق", vom: "من الـ", vorliegen: "متوفرة", weg: "بعيدًا", zehn: "عشرة", zeitlich: "زمنيًا", zugesagte: "الموعودة", zwölf: "اثنا عشر", öffne: "أفتح", öfter: "بشكل أكثر تكرارًا",
 };
 
 const vocabularyTokenTranslations = new Map<string, string>();

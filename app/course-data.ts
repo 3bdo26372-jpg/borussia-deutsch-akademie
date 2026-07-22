@@ -175,97 +175,176 @@ const vocabGroups: { category: string; words: VocabSeed[] }[] = [
   }
 ];
 
-const learningText = (word: string, category: string, index: number) => {
+const nounForms = (word: string) => {
+  const irregularAccusative: Record<string, string> = {
+    "der Benutzername": "den Benutzernamen",
+    "der technische Support": "den technischen Support",
+    "der Vorgesetzte": "den Vorgesetzten",
+  };
+  if (irregularAccusative[word]) return { nominative: word, accusative: irregularAccusative[word] };
+  const match = word.match(/^(der|die|das)\s+(.+)$/u);
+  if (!match) return { nominative: word, accusative: word };
+  const [, article, noun] = match;
+  const accusativeArticle = article === "der" ? "den" : article;
+  return { nominative: word, accusative: `${accusativeArticle} ${noun}` };
+};
+
+const termLabel = (word: string, type: string) => {
+  const labels: Record<string, string> = {
+    Verb: "das Verb",
+    Adjektiv: "das Adjektiv",
+    Adverb: "das Adverb",
+    Konnektor: "der Konnektor",
+    Redemittel: "das Redemittel",
+  };
+  return `${labels[type] ?? "der Ausdruck"} ${word}`;
+};
+
+const usageOverrides: Record<string, { exampleDe: string; situationDe: string }> = {
+  zustellen: { exampleDe: "Der Versanddienstleister kann das Paket morgen zustellen.", situationDe: "Kunde: Können Sie mein Paket noch heute zustellen? Mitarbeiter: Ich prüfe sofort, ob eine Zustellung heute möglich ist." },
+  liefern: { exampleDe: "Wir liefern Ihre Bestellung innerhalb von drei Werktagen.", situationDe: "Kunde: Können Sie die Ware bis Freitag liefern? Mitarbeiter: Ja, der geplante Liefertermin ist Freitag." },
+  "sich verspäten": { exampleDe: "Wegen des hohen Paketaufkommens kann sich die Lieferung verspäten.", situationDe: "Kunde: Kann sich meine Lieferung noch weiter verspäten? Mitarbeiter: Laut aktuellem Stand kommt das Paket morgen an." },
+  unterwegs: { exampleDe: "Ihr Paket ist bereits unterwegs und erreicht Sie voraussichtlich morgen.", situationDe: "Kunde: Ist meine Bestellung schon unterwegs? Mitarbeiter: Ja, das Paket wurde heute an den Versanddienstleister übergeben." },
+  voraussichtlich: { exampleDe: "Ihre Bestellung kommt voraussichtlich morgen zwischen zehn und zwölf Uhr an.", situationDe: "Kunde: Wann kommt mein Paket voraussichtlich an? Mitarbeiter: Der geplante Liefertermin ist morgen." },
+  beschädigt: { exampleDe: "Das Paket ist beschädigt angekommen, deshalb dokumentiere ich den Schaden mit Fotos.", situationDe: "Kunde: Mein Paket ist beschädigt angekommen. Mitarbeiter: Das tut mir leid. Bitte senden Sie uns zwei Fotos vom Schaden." },
+  defekt: { exampleDe: "Das gelieferte Gerät ist defekt und lässt sich nicht einschalten.", situationDe: "Kunde: Das neue Gerät ist defekt. Mitarbeiter: Ich organisiere gern einen Austausch für Sie." },
+  fehlen: { exampleDe: "In der Lieferung kann ein Artikel fehlen, obwohl das Paket vollständig verschlossen war.", situationDe: "Kunde: In meinem Paket scheint ein Artikel zu fehlen. Mitarbeiter: Ich prüfe den Lieferumfang und finde eine Lösung für Sie." },
+  zurückgeben: { exampleDe: "Sie können den unbenutzten Artikel innerhalb der Rückgabefrist zurückgeben.", situationDe: "Kunde: Kann ich den Artikel in der Filiale zurückgeben? Mitarbeiter: Ja, bringen Sie bitte den Kaufbeleg mit." },
+  zurückschicken: { exampleDe: "Mit dem Rücksendeetikett können Sie die Ware kostenlos zurückschicken.", situationDe: "Kunde: Wie kann ich den falschen Artikel zurückschicken? Mitarbeiter: Ich sende Ihnen sofort ein Rücksendeetikett per E-Mail." },
+  abgeben: { exampleDe: "Sie können das frankierte Paket in jeder Filiale des Versanddienstleisters abgeben.", situationDe: "Kunde: Wo kann ich die Rücksendung abgeben? Mitarbeiter: Sie können sie in der nächsten Paketfiliale abgeben." },
+  ersetzen: { exampleDe: "Wir können den beschädigten Artikel kostenlos ersetzen.", situationDe: "Kunde: Können Sie das defekte Gerät ersetzen? Mitarbeiter: Ja, ich veranlasse sofort eine Ersatzlieferung." },
+  erstatten: { exampleDe: "Nach Eingang der Retoure erstatten wir Ihnen den vollständigen Betrag.", situationDe: "Kunde: Wann können Sie mir den Kaufpreis erstatten? Mitarbeiter: Die Erstattung erfolgt spätestens fünf Werktage nach der Prüfung." },
+  veranlassen: { exampleDe: "Nach der Prüfung kann ich die Rückerstattung sofort veranlassen.", situationDe: "Kunde: Können Sie heute eine Ersatzlieferung veranlassen? Mitarbeiter: Ja, ich erledige das direkt für Sie." },
+  stornieren: { exampleDe: "Solange die Ware noch nicht versendet wurde, können Sie die Bestellung stornieren.", situationDe: "Kunde: Kann ich meine Bestellung noch stornieren? Mitarbeiter: Ja, sie wurde noch nicht an den Versand übergeben." },
+  widerrufen: { exampleDe: "Sie können den Vertrag innerhalb der gesetzlichen Frist widerrufen.", situationDe: "Kunde: Wie kann ich den Vertrag widerrufen? Mitarbeiter: Ich erkläre Ihnen den Ablauf und sende Ihnen das passende Formular." },
+  beschleunigen: { exampleDe: "Mit vollständigen Unterlagen können wir die Bearbeitung deutlich beschleunigen.", situationDe: "Kunde: Können Sie die Rückerstattung beschleunigen? Mitarbeiter: Ich prüfe, ob alle benötigten Angaben bereits vorliegen." },
+  überweisen: { exampleDe: "Bitte überweisen Sie den offenen Betrag unter Angabe der Rechnungsnummer.", situationDe: "Kunde: Auf welches Konto soll ich den Betrag überweisen? Mitarbeiter: Die Bankverbindung finden Sie unten auf Ihrer Rechnung." },
+  abbuchen: { exampleDe: "Wir buchen den Rechnungsbetrag erst nach dem Versand der Ware ab.", situationDe: "Kunde: Wann werden Sie den Betrag abbuchen? Mitarbeiter: Die Abbuchung erfolgt nach dem Versand Ihrer Bestellung." },
+  doppelt: { exampleDe: "Der Rechnungsbetrag wurde versehentlich doppelt abgebucht.", situationDe: "Kunde: Warum wurde der Betrag doppelt abgebucht? Mitarbeiter: Ich prüfe beide Buchungen und korrigiere den Fehler." },
+  fällig: { exampleDe: "Der Rechnungsbetrag ist am Ende dieses Monats fällig.", situationDe: "Kunde: Wann ist die Rechnung fällig? Mitarbeiter: Das Fälligkeitsdatum ist der dreißigste Juni." },
+  überfällig: { exampleDe: "Die Rechnung ist seit fünf Tagen überfällig.", situationDe: "Kunde: Ist meine Rechnung bereits überfällig? Mitarbeiter: Ja, die Zahlungsfrist ist letzte Woche abgelaufen." },
+  ablehnen: { exampleDe: "Die Bank kann eine Zahlung aus Sicherheitsgründen ablehnen.", situationDe: "Kunde: Warum hat die Bank meine Zahlung abgelehnt? Mitarbeiter: Bitte prüfen Sie das Kartenlimit oder fragen Sie direkt bei Ihrer Bank nach." },
+  "sich beschweren": { exampleDe: "Ein Kunde kann sich beschweren, wenn eine zugesagte Leistung nicht erbracht wurde.", situationDe: "Kunde: Ich möchte mich über die lange Wartezeit beschweren. Mitarbeiter: Das verstehe ich. Ich dokumentiere Ihre Beschwerde und prüfe den Vorgang." },
+  reklamieren: { exampleDe: "Der Kunde möchte die beschädigte Ware reklamieren.", situationDe: "Kunde: Ich möchte den defekten Artikel reklamieren. Mitarbeiter: Gern. Nennen Sie mir bitte zuerst Ihre Bestellnummer." },
+  beheben: { exampleDe: "Die Fachabteilung konnte den technischen Fehler schnell beheben.", situationDe: "Kunde: Können Sie das Problem heute beheben? Mitarbeiter: Ich prüfe die Ursache und informiere Sie über den nächsten Schritt." },
+  prüfen: { exampleDe: "Ich prüfe zuerst alle Angaben, bevor ich eine verbindliche Antwort gebe.", situationDe: "Kunde: Können Sie den aktuellen Stand bitte prüfen? Mitarbeiter: Ja, einen Moment bitte. Ich öffne gerade Ihren Vorgang." },
+  bestätigen: { exampleDe: "Nach der Kontrolle bestätige ich dem Kunden den vereinbarten Liefertermin.", situationDe: "Kunde: Können Sie den Termin schriftlich bestätigen? Mitarbeiter: Ja, Sie erhalten gleich eine Bestätigung per E-Mail." },
+  weiterleiten: { exampleDe: "Ich leite die Anfrage mit allen wichtigen Informationen an die Fachabteilung weiter.", situationDe: "Kunde: Können Sie meine Beschwerde an die Leitung weiterleiten? Mitarbeiter: Ja, ich dokumentiere alles und leite den Vorgang sofort weiter." },
+  durchstellen: { exampleDe: "Bei einer technischen Frage kann ich den Anrufer direkt zur Fachabteilung durchstellen.", situationDe: "Kunde: Können Sie mich zum technischen Support durchstellen? Mitarbeiter: Ja, bitte bleiben Sie kurz in der Leitung." },
+  zuständig: { exampleDe: "Für diese technische Anfrage ist die Fachabteilung zuständig.", situationDe: "Kunde: Wer ist für meinen Fall zuständig? Mitarbeiter: Ich verbinde Sie mit der zuständigen Fachabteilung." },
+  "sich bewerben": { exampleDe: "Nach meinem Studium möchte ich mich für eine Stelle im Kundenservice bewerben.", situationDe: "Interviewer: Warum möchten Sie sich bei uns bewerben? Bewerber: Die Position passt sehr gut zu meiner Erfahrung und meinen Stärken." },
+  "sich weiterentwickeln": { exampleDe: "Ich möchte mich beruflich weiterentwickeln und schrittweise mehr Verantwortung übernehmen.", situationDe: "Interviewer: Wie möchten Sie sich in den nächsten Jahren weiterentwickeln? Bewerber: Ich möchte meine Fachkenntnisse vertiefen und neue Aufgaben übernehmen." },
+  "sich vergleichen": { exampleDe: "In sozialen Medien vergleichen sich viele Menschen ständig mit anderen.", situationDe: "Prüfer: Warum vergleichen sich Menschen in sozialen Medien so häufig? Teilnehmer: Sie sehen meist nur die positiven Seiten des Lebens anderer Menschen." },
+  einerseits: { exampleDe: "Einerseits erleichtern soziale Medien die Kommunikation, andererseits können sie viel Zeit kosten.", situationDe: "Prüfer: Welche Vorteile sehen Sie einerseits und welche Nachteile andererseits? Teilnehmer: Einerseits bleiben Menschen in Kontakt, andererseits kann die Konzentration leiden." },
+  andererseits: { exampleDe: "Soziale Medien sind praktisch; andererseits können sie vom Alltag ablenken.", situationDe: "Prüfer: Was spricht andererseits gegen eine intensive Nutzung? Teilnehmer: Sie kann Stress verursachen und sehr viel Zeit beanspruchen." },
+  obwohl: { exampleDe: "Obwohl soziale Medien nützlich sind, sollte man regelmäßig Pausen machen.", situationDe: "Prüfer: Nutzen Sie soziale Medien, obwohl sie manchmal ablenken? Teilnehmer: Ja, aber ich begrenze meine tägliche Nutzungszeit." },
+  weil: { exampleDe: "Ich mache regelmäßige Pausen, weil ich mich danach besser konzentrieren kann.", situationDe: "Prüfer: Warum begrenzen Sie Ihre Bildschirmzeit? Teilnehmer: Weil ich meine Freizeit bewusster nutzen möchte." },
+  deshalb: { exampleDe: "Zu viel Bildschirmzeit stört meine Konzentration; deshalb lege ich das Handy öfter weg.", situationDe: "Prüfer: Sie möchten konzentrierter arbeiten. Was tun Sie deshalb? Teilnehmer: Ich schalte Benachrichtigungen aus und plane feste Pausen." },
+  "meiner Meinung nach": { exampleDe: "Soziale Medien sollten meiner Meinung nach bewusst und zeitlich begrenzt genutzt werden.", situationDe: "Prüfer: Wie sollten Kinder Ihrer Meinung nach mit sozialen Medien umgehen? Teilnehmer: Meiner Meinung nach brauchen sie klare Regeln und die Unterstützung ihrer Eltern." },
+};
+
+const interviewAdjectives = new Set(["zuverlässig", "pünktlich", "geduldig", "flexibel", "belastbar", "lernbereit", "lösungsorientiert", "teamfähig", "kommunikationsstark"]);
+
+const learningText = (word: string, type: string, category: string, index: number) => {
+  if (usageOverrides[word]) return usageOverrides[word];
+  if (interviewAdjectives.has(word)) return {
+    exampleDe: `Im Arbeitsalltag bin ich ${word}, auch wenn eine Aufgabe anspruchsvoll wird.`,
+    situationDe: `Interviewer: Wie zeigen Sie im Arbeitsalltag, dass Sie ${word} sind? Bewerber: Ich nenne Ihnen gern ein konkretes Beispiel aus meiner bisherigen Erfahrung.`,
+  };
+  const { nominative, accusative } = nounForms(word);
+  const target = type === "Nomen" ? nominative : termLabel(word, type);
+  const object = type === "Nomen" ? accusative : target.replace(/^der /u, "den ");
+  const sentenceTarget = target.charAt(0).toLocaleUpperCase("de-DE") + target.slice(1);
   const templates: Record<string, { examples: string[]; situations: string[] }> = {
     "الطلبات والشحن": {
       examples: [
-        `Der Begriff „${word}“ ist wichtig, wenn ein Kunde den Status seiner Bestellung wissen möchte.`,
-        `Im Bestellsystem prüfe ich den Eintrag „${word}“, bevor ich dem Kunden eine verbindliche Auskunft gebe.`,
-        `Bei einer Rückfrage zum Versand erkläre ich „${word}“ klar und in einfachen Worten.`,
-        `Ich dokumentiere „${word}“ sorgfältig, damit der Vorgang für meine Kollegen nachvollziehbar bleibt.`,
+        `${sentenceTarget} ist im Bestellsystem eindeutig dokumentiert.`,
+        `Im Bestellsystem prüfe ich ${object}, bevor ich dem Kunden eine verbindliche Auskunft gebe.`,
+        `Bei einer Rückfrage erkläre ich dem Kunden alle wichtigen Informationen über ${object}.`,
+        `Im Versandbericht dokumentiere ich ${object}, damit der Vorgang nachvollziehbar bleibt.`,
       ],
       situations: [
-        `Kunde: Ich habe eine Frage zum Begriff „${word}“. Mitarbeiter: Gern. Ich prüfe zuerst Ihre Bestelldaten und erkläre Ihnen danach den nächsten Schritt.`,
-        `Kunde: Können Sie mir sagen, was „${word}“ in meinem Fall bedeutet? Mitarbeiter: Ja. Ich sehe mir den aktuellen Stand an und gebe Ihnen gleich eine klare Auskunft.`,
-        `Mitarbeiter: In Ihrem Bestellvorgang ist „${word}“ relevant. Kunde: Könnten Sie mir bitte erklären, was ich jetzt tun soll?`,
+        `Kunde: In meiner Bestellübersicht sehe ich ${object}. Können Sie mir das bitte erklären? Mitarbeiter: Gern. Ich prüfe zuerst Ihre Bestelldaten und erkläre Ihnen danach den nächsten Schritt.`,
+        `Kunde: Können Sie ${object} bitte für mich prüfen? Mitarbeiter: Ja. Ich sehe mir den aktuellen Stand an und gebe Ihnen gleich eine klare Auskunft.`,
+        `Mitarbeiter: Für Ihre Bestellung muss ich ${object} genauer prüfen. Kunde: Könnten Sie mir danach bitte sagen, was ich tun soll?`,
       ],
     },
     "الإرجاع والاستبدال": {
       examples: [
-        `Bei einer Reklamation prüfe ich, welche Rolle „${word}“ für die passende Lösung spielt.`,
-        `Ich erkläre der Kundin den Ablauf rund um „${word}“ Schritt für Schritt.`,
-        `Bevor ich etwas verspreche, kontrolliere ich die Bedingungen für „${word}“ im System.`,
-        `Der Eintrag „${word}“ hilft mir, den nächsten Bearbeitungsschritt korrekt festzulegen.`,
+        `Bei einer Reklamation prüfe ich ${object}, bevor ich eine passende Lösung anbiete.`,
+        `Ich erkläre der Kundin, welche Bedeutung ${target} für die Bearbeitung hat.`,
+        `Bevor ich etwas verspreche, prüfe ich alle Informationen über ${object}.`,
+        `Für den nächsten Bearbeitungsschritt berücksichtige ich ${object} besonders sorgfältig.`,
       ],
       situations: [
-        `Kunde: Welche Lösung gibt es in Verbindung mit „${word}“? Mitarbeiter: Ich prüfe Ihren Fall und erkläre Ihnen gleich die verfügbaren Optionen.`,
-        `Mitarbeiter: Für Ihre Reklamation müssen wir „${word}“ genauer prüfen. Kunde: Welche Unterlagen benötigen Sie dafür von mir?`,
-        `Kunde: Was muss ich beim Thema „${word}“ beachten? Mitarbeiter: Ich führe Sie Schritt für Schritt durch den Ablauf und fasse am Ende alles zusammen.`,
+        `Kunde: Welche Möglichkeiten habe ich für ${object}? Mitarbeiter: Ich prüfe Ihren Fall und erkläre Ihnen gleich die verfügbaren Optionen.`,
+        `Mitarbeiter: Für Ihre Reklamation benötige ich noch Informationen über ${object}. Kunde: Welche Unterlagen benötigen Sie dafür von mir?`,
+        `Kunde: Was muss ich beachten, wenn es um ${object} geht? Mitarbeiter: Ich führe Sie Schritt für Schritt durch den Ablauf und fasse am Ende alles zusammen.`,
       ],
     },
     "الدفع والفواتير": {
       examples: [
-        `Auf der Rechnung prüfe ich den Eintrag „${word}“ besonders sorgfältig, bevor ich dem Kunden antworte.`,
-        `Die Buchhaltung kontrolliert „${word}“, damit der Zahlungsvorgang eindeutig nachvollziehbar bleibt.`,
-        `Im Kundenkonto ist „${word}“ zusammen mit dem aktuellen Zahlungsstatus dokumentiert.`,
-        `Ich erkläre dem Kunden den Begriff „${word}“ und nenne ihm anschließend die möglichen nächsten Schritte.`,
+        `Bei einer Frage zur Rechnung prüfe ich ${object} besonders sorgfältig, bevor ich dem Kunden antworte.`,
+        `Die Buchhaltung kontrolliert ${object}, damit der Zahlungsvorgang eindeutig nachvollziehbar bleibt.`,
+        `Im Kundenkonto ist ${target} zusammen mit dem aktuellen Zahlungsstatus dokumentiert.`,
+        `Ich erkläre dem Kunden ${object} und nenne ihm anschließend die möglichen nächsten Schritte.`,
       ],
       situations: [
-        `Kunde: Auf meiner Rechnung steht der Begriff „${word}“. Was bedeutet das genau? Mitarbeiter: Ich prüfe den Eintrag und erkläre Ihnen anschließend, wie die Zahlung verbucht wurde.`,
-        `Mitarbeiter: Damit ich die Zahlung prüfen kann, benötige ich noch Angaben zu „${word}“. Kunde: In Ordnung. Ich sende Ihnen die Informationen sofort.`,
-        `Kunde: Können Sie mir „${word}“ bitte genauer erklären? Mitarbeiter: Natürlich. Ich gehe die Buchung mit Ihnen durch und beantworte danach Ihre Fragen.`,
+        `Kunde: In meinem Kundenkonto sehe ich ${object}. Was bedeutet das genau? Mitarbeiter: Ich prüfe den Eintrag und erkläre Ihnen anschließend, wie die Zahlung verbucht wurde.`,
+        `Mitarbeiter: Damit ich die Zahlung prüfen kann, benötige ich noch Angaben über ${object}. Kunde: In Ordnung. Ich sende Ihnen die Informationen sofort.`,
+        `Kunde: Können Sie mir ${object} bitte genauer erklären? Mitarbeiter: Natürlich. Ich gehe die Buchung mit Ihnen durch und beantworte danach Ihre Fragen.`,
       ],
     },
     "خدمة العملاء": {
       examples: [
-        `Im Kundenservice hilft „${word}“ dabei, ein Anliegen freundlich und professionell zu bearbeiten.`,
-        `Ich verwende den Ausdruck „${word}“, wenn er zur Situation des Kunden passt.`,
-        `Eine gute Lösung beginnt damit, „${word}“ richtig zu verstehen und gezielt nachzufragen.`,
-        `Die Mitarbeiterin dokumentiert „${word}“ sachlich, damit der nächste Kollege den Fall sofort versteht.`,
+        `Im Kundenservice spielt ${target} eine wichtige Rolle.`,
+        `Bei der Bearbeitung berücksichtigt die Mitarbeiterin ${object}.`,
+        `Im Gespräch spricht der Mitarbeiter ${object} offen und sachlich an.`,
+        `Der Mitarbeiter erklärt, warum ${target} in diesem Fall wichtig ist.`,
       ],
       situations: [
-        `Kunde: Ich brauche Unterstützung beim Thema „${word}“. Mitarbeiter: Gern. Erzählen Sie mir bitte kurz, was genau passiert ist.`,
-        `Mitarbeiter: Darf ich Ihnen eine kurze Frage zu „${word}“ stellen? Kunde: Ja, natürlich. Welche Information benötigen Sie?`,
-        `Kunde: Wie gehen wir bei „${word}“ jetzt weiter vor? Mitarbeiter: Ich erkläre Ihnen den nächsten Schritt und bleibe bei Rückfragen gern für Sie da.`,
+        `Kunde: Welche Rolle spielt ${target} in meinem Fall? Mitarbeiter: Ich erkläre Ihnen gern, was das für die weitere Bearbeitung bedeutet.`,
+        `Mitarbeiter: Ich möchte ${object} kurz ansprechen. Kunde: Gern. Welche Information benötigen Sie von mir?`,
+        `Kunde: Können Sie mir erklären, warum ${target} hier wichtig ist? Mitarbeiter: Natürlich. Ich erkläre Ihnen den nächsten Schritt und beantworte Ihre Fragen.`,
       ],
     },
     "الهاتف والدعم التقني": {
       examples: [
-        `Der technische Support prüft „${word}“ systematisch, bevor weitere Schritte eingeleitet werden.`,
-        `Am Telefon erkläre ich „${word}“ langsam, deutlich und ohne unnötige Fachbegriffe.`,
-        `Im Support-Ticket dokumentiere ich „${word}“ zusammen mit allen bereits getesteten Schritten.`,
-        `Die Fachabteilung benötigt genaue Informationen zu „${word}“, um den Fehler zuverlässig zu analysieren.`,
+        `Der technische Support prüft ${object} systematisch, bevor weitere Schritte eingeleitet werden.`,
+        `Am Telefon kläre ich alle Fragen rund um ${object}.`,
+        `Im Support-Ticket erfasse ich alle wichtigen Angaben über ${object}.`,
+        `Die Fachabteilung prüft, ob ${target} mit dem Fehler zusammenhängt.`,
       ],
       situations: [
-        `Kunde: Mein technisches Problem betrifft „${word}“. Mitarbeiter: Welche Meldung sehen Sie genau, und seit wann tritt der Fehler auf?`,
-        `Mitarbeiter: Ich prüfe jetzt „${word}“ und dokumentiere das Ergebnis. Kunde: Soll ich währenddessen am Telefon bleiben?`,
-        `Kunde: Können Sie mir beim Thema „${word}“ helfen? Mitarbeiter: Ja. Wir gehen die Schritte gemeinsam durch und prüfen nach jedem Schritt das Ergebnis.`,
+        `Kunde: Mein technisches Problem betrifft ${object}. Mitarbeiter: Welche Meldung sehen Sie genau, und seit wann tritt der Fehler auf?`,
+        `Mitarbeiter: Ich prüfe jetzt ${object} und dokumentiere das Ergebnis. Kunde: Soll ich währenddessen am Telefon bleiben?`,
+        `Kunde: Können Sie ${object} bitte mit mir prüfen? Mitarbeiter: Ja. Wir gehen die Schritte gemeinsam durch und prüfen nach jedem Schritt das Ergebnis.`,
       ],
     },
     "المقابلة والعمل": {
       examples: [
-        `Im Bewerbungsgespräch spreche ich offen über „${word}“ und verbinde den Begriff mit einer eigenen Erfahrung.`,
-        `Für diese Position ist „${word}“ relevant, weil die Aufgabe direkten Kontakt mit Kunden erfordert.`,
-        `Mein Beispiel aus der Praxis zeigt, wie ich „${word}“ im Arbeitsalltag konkret eingesetzt habe.`,
-        `Die Frage zu „${word}“ beantworte ich mit einer kurzen Situation, meiner Aufgabe und dem erreichten Ergebnis.`,
+        `Im Bewerbungsgespräch spreche ich offen über ${object} und nenne dazu eine eigene Erfahrung.`,
+        `Für diese Position ist ${target} besonders wichtig.`,
+        `Anhand eines konkreten Beispiels erläutere ich ${object}.`,
+        `Ich erkläre, welche Bedeutung ${target} für meine berufliche Entwicklung hat.`,
       ],
       situations: [
-        `Interviewer: Was können Sie uns über „${word}“ erzählen? Bewerber: Gern. Ich nenne Ihnen eine konkrete Situation und erkläre, was ich daraus gelernt habe.`,
-        `Bewerber: Für meine Arbeit ist „${word}“ besonders wichtig. Interviewer: Können Sie das bitte mit einem praktischen Beispiel belegen?`,
-        `Interviewer: Welche Erfahrung haben Sie mit „${word}“ gesammelt? Bewerber: Ich beschreibe Ihnen kurz die Ausgangssituation, meine Aufgabe und das Ergebnis.`,
+        `Interviewer: Was können Sie uns über ${object} erzählen? Bewerber: Gern. Ich nenne Ihnen eine konkrete Situation und erkläre, was ich daraus gelernt habe.`,
+        `Bewerber: ${sentenceTarget} ist für meine Arbeit besonders wichtig. Interviewer: Können Sie das bitte mit einem praktischen Beispiel belegen?`,
+        `Interviewer: Welche Bedeutung hat ${target} für Ihre berufliche Entwicklung? Bewerber: Ich beschreibe Ihnen gern meine Ziele und eine passende Erfahrung.`,
       ],
     },
     "B2 والحياة اليومية": {
       examples: [
-        `In einer B2-Diskussion verwende ich „${word}“ bewusst, um mein Argument genauer zu formulieren.`,
-        `Mein Beitrag zum Alltag enthält „${word}“ und ein Beispiel aus meiner persönlichen Erfahrung.`,
-        `Im Text wird „${word}“ erklärt und anschließend mit einem konkreten Beispiel verdeutlicht.`,
-        `Mit dem Ausdruck „${word}“ kann ich meine Meinung differenziert und verständlich darstellen.`,
+        `In einer B2-Diskussion spreche ich über ${object} und begründe meine Meinung.`,
+        `Mein Beitrag zum Alltag behandelt ${object} und enthält ein Beispiel aus meiner persönlichen Erfahrung.`,
+        `An einem konkreten Beispiel erläutere ich ${object}.`,
+        `Ich erkläre, welche Rolle ${target} im Alltag spielt.`,
       ],
       situations: [
-        `Prüfer: Wie verwenden Sie „${word}“ in einer Diskussion? Teilnehmer: Ich erkläre zuerst meine Meinung und ergänze danach ein Beispiel aus dem Alltag.`,
-        `Teilnehmer: Mein nächster Punkt betrifft „${word}“. Prüfer: Bitte erklären Sie Ihre Position und nennen Sie einen konkreten Grund.`,
-        `Prüfer: Welche Bedeutung hat „${word}“ in diesem Zusammenhang? Teilnehmer: Ich erkläre den Begriff kurz und zeige anschließend ein passendes Beispiel.`,
+        `Prüfer: Welche Meinung haben Sie über ${object}? Teilnehmer: Ich erkläre meinen Standpunkt und ergänze danach ein Beispiel aus dem Alltag.`,
+        `Teilnehmer: Mein nächster Punkt betrifft ${object}. Prüfer: Bitte erklären Sie Ihre Position und nennen Sie einen konkreten Grund.`,
+        `Prüfer: Welche Rolle spielt ${target} in diesem Zusammenhang? Teilnehmer: Ich erkläre den Zusammenhang und zeige anschließend ein passendes Beispiel.`,
       ],
     },
   };
@@ -282,7 +361,7 @@ export const vocabulary: Vocabulary[] = vocabGroups.flatMap((group) => group.wor
   arabic,
   type,
   category: group.category,
-  ...learningText(word, group.category, index),
+  ...learningText(word, type, group.category, index),
 }))).map((item, index) => ({ ...item, id: index + 1 }));
 
 export const scenarios: Scenario[] = [
