@@ -9,9 +9,9 @@ An Arabic-first interactive German course for job interviews and customer servic
 - 160+ clickable vocabulary entries with Arabic meaning, examples and scenarios
 - customer-service role plays
 - German text-to-speech
-- translations hidden until the learner requests them
-- local progress tracking with no backend
-- responsive Arabic/German interface
+- translations shown in a small tooltip only on hover, keyboard focus, or touch
+- responsive Arabic/German interface with a mobile-first interaction layer
+- 100% static frontend: no API, server functions, database, accounts, or progress tracking
 
 ## Run locally
 
@@ -27,4 +27,4 @@ npm run build
 npm test
 ```
 
-The app is frontend-only. Learning progress is stored locally in the browser.
+The app exports to the static `out/` directory and can be hosted on any static host.
