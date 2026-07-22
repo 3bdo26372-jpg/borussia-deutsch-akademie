@@ -89,3 +89,38 @@ button:focus-visible,input:focus-visible,select:focus-visible,.touch-word:focus-
 }
 @media(hover:none){.word-card:hover{transform:none;box-shadow:none;background:var(--white);border-color:var(--line)}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
+/* One-word action menu, shared by every German learning text. */
+.touch-word:hover>.word-menu,.touch-word:focus>.word-menu,.touch-word:focus-visible>.word-menu,.touch-word.tooltip-open>.word-menu{pointer-events:auto}
+.word-menu{min-width:220px;text-align:center;direction:ltr;cursor:default}
+.selected-word{display:block;color:var(--yellow);font:900 14px Arial;margin-bottom:8px;overflow-wrap:anywhere}
+.single-word-meaning{display:none;margin-top:6px;padding:7px 9px;border-radius:7px;background:#ffffff12;color:#fff;font-size:14px;text-align:center}
+.word-menu-actions{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.word-menu-actions button,.translation-option-label{min-height:38px;border:1px solid #ffffff33;border-radius:7px;background:#292a26;color:#fff;padding:7px 8px;font:800 11px Arial;cursor:pointer;display:grid;place-items:center}
+.translation-option{cursor:pointer;display:block}
+.translation-option input{position:absolute;opacity:0;pointer-events:none}
+.translation-option-label{background:var(--yellow);color:var(--black);border-color:var(--yellow)}
+.translation-option input:checked~.single-word-meaning{display:block}
+.word-menu-actions button:hover{border-color:var(--yellow)}
+.word-details-button{width:100%;min-height:40px;margin-top:auto;border:0;border-radius:8px;background:var(--black);color:var(--yellow);font-weight:800}
+.two-stats{grid-template-columns:repeat(2,1fr)}
+.two-stats>div:last-child{border-left:0}
+.focus-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:20px}
+.focus-grid>button{min-height:180px;border:1px solid var(--line);border-radius:18px;background:var(--white);padding:24px;display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:center;text-align:left}
+.focus-grid>button:hover{border-color:var(--black);box-shadow:6px 6px 0 var(--yellow);transform:translateY(-2px)}
+.focus-grid>button>span{width:58px;height:58px;border-radius:15px;background:var(--yellow);display:grid;place-items:center;font:900 22px Arial}
+.focus-grid small{color:var(--red);font:800 9px Arial;letter-spacing:1.7px}
+.focus-grid h2{margin:6px 0;font-size:23px}.focus-grid p{margin:0;color:var(--muted);line-height:1.6}.focus-grid b{font-size:22px}
+@media(max-width:800px){
+  .compact-nav{grid-template-columns:repeat(3,1fr)}
+  .word-menu{min-width:0}
+  .word-menu-actions button,.translation-option-label{min-height:44px;font-size:12px}
+  .focus-grid{grid-template-columns:1fr;gap:12px}
+  .focus-grid>button{min-height:150px;padding:18px}
+}
+@media(max-width:560px){
+  .two-stats{grid-template-columns:1fr 1fr}
+  .focus-grid>button{grid-template-columns:auto 1fr;gap:13px}
+  .focus-grid>button>b{display:none}
+  .focus-grid h2{font-size:19px}
+}
