@@ -1,22 +1,13 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { readFile } from "node:fs/promises";
 
-async function render() {
-  const workerUrl = new URL("../dist/server/index.js", import.meta.url);
-  workerUrl.searchParams.set("test", `${process.pid}-${Date.now()}`);
-  const { default: worker } = await import(workerUrl.href);
-  return worker.fetch(new Request("http://localhost/", { headers: { accept: "text/html" } }), {
-    ASSETS: { fetch: async () => new Response("Not found", { status: 404 }) },
-  }, { waitUntil() {}, passThroughOnException() {} });
-}
-
-test("server-renders Borussia Deutsch Akademie", async () => {
-  const response = await render();
-  assert.equal(response.status, 200);
-  assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
-  const html = await response.text();
+test("static export contains Borussia Deutsch Akademie", async () => {
+  const html = await readFile(new URL("../out/index.html", import.meta.url), "utf8");
   assert.match(html, /Borussia Deutsch Akademie/i);
-  assert.match(html, /اتكلم ألماني/);
+  assert.match(html, /Deutsch sprechen/);
   assert.match(html, /DEIN WEG ZUM ERFOLG/);
+  assert.match(html, /hover-translation/);
+  assert.doesNotMatch(html, /bda-progress|localStorage|Fortschritt/);
   assert.doesNotMatch(html, /Your site is taking shape|codex-preview|SkeletonPreview/);
 });
