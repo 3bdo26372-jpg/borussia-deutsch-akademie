@@ -9,7 +9,7 @@
 
 /* Translation tooltips: hidden until hover, focus, or an intentional tap. */
 .hover-translation{display:inline}
-.touch-word{position:relative;display:inline;cursor:help;text-decoration-line:underline;text-decoration-style:dotted;text-decoration-color:#d3b400;text-decoration-thickness:1px;text-underline-offset:4px;outline:none}
+.touch-word{position:relative;display:inline;cursor:pointer;text-decoration:none;outline:none}
 .hover-tooltip{position:absolute;z-index:120;bottom:calc(100% + 11px);left:50%;width:max-content;min-width:150px;max-width:min(310px,80vw);padding:9px 12px;border:1px solid var(--yellow);border-radius:9px;background:#10110f;color:#fffdf5;box-shadow:0 12px 34px #0006;font-family:"Segoe UI",Tahoma,Arial,sans-serif;font-size:12px;font-weight:600;line-height:1.6;text-align:right;direction:rtl;white-space:normal;opacity:0;visibility:hidden;pointer-events:none;transform:translate(-50%,6px);transition:opacity .15s ease,transform .15s ease,visibility .15s ease}
 .hover-tooltip:after{content:"";position:absolute;top:100%;left:50%;width:9px;height:9px;background:#10110f;border-right:1px solid var(--yellow);border-bottom:1px solid var(--yellow);transform:translate(-50%,-5px) rotate(45deg)}
 .touch-word:hover>.hover-tooltip,.touch-word:focus>.hover-tooltip,.touch-word:focus-visible>.hover-tooltip,.touch-word.tooltip-open>.hover-tooltip{opacity:1;visibility:visible;transform:translate(-50%,0)}
