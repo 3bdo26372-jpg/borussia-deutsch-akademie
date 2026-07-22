@@ -1,0 +1,13 @@
+{
+  "name": "Borussia Deutsch Akademie",
+  "short_name": "BDA",
+  "description": "Deutschtraining für Interview und Kundenservice.",
+  "start_url": "/#home",
+  "display": "standalone",
+  "background_color": "#10110f",
+  "theme_color": "#ffd900",
+  "lang": "de",
+  "icons": [
+    { "src": "/favicon.png", "sizes": "64x64", "type": "image/png" }
+  ]
+}
