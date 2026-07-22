@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { readFileSync } from "node:fs";
-import { questions, vocabulary } from "../app/course-data";
+import { questions, scenarios, vocabulary } from "../app/course-data";
 
 const pageSource = readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8");
 const lexiconSource = pageSource.match(/const coreLexicon: Record<string, string> = (\{[\s\S]*?\});\r?\n\r?\nconst vocabularyTokenTranslations/u)?.[1];
@@ -28,15 +28,20 @@ test("every learning-content token has an Arabic meaning", () => {
   const texts = [
     ...questions.flatMap((item) => [item.qDe, item.answerDe]),
     ...vocabulary.flatMap((item) => [item.word, item.exampleDe, item.situationDe]),
+    ...scenarios.flatMap((item) => [item.titleDe, ...item.lines.flatMap((line) => [line.speaker, line.de])]),
     "Fragen verstehen. Wörter beherrschen.",
-    "Konzentriertes Deutschtraining mit Interviewfragen, flexiblen Musterantworten und interaktivem Wortschatz.",
+    "Konzentriertes Deutschtraining mit Interviewfragen, flexiblen Musterantworten, interaktivem Wortschatz und echten Dialogen.",
     "Jedes Lernwort bietet zwei Optionen: Übersetzen oder auf Deutsch anhören.",
     "DEUTSCH BEREIT FÜRS INTERVIEW",
     "DEIN INTERVIEW-TRAINING",
     "Wort antippen: Übersetzen oder mit deutscher Stimme anhören.",
-    "Fragen mit Antworten. Interaktive Wörter. Interviewfragen. Wortschatz.",
-    "Borussia Deutsch Akademie. Fragen und Wortschatz.",
+    "Fragen mit Antworten. Interaktive Wörter. Komplette Dialoge. Interviewfragen. Wortschatz. Rollenspiele.",
+    "Borussia Deutsch Akademie. Fragen, Wortschatz und Dialoge.",
     "Personalisieren: Ersetze nur Angaben in eckigen Klammern und sprich mit natürlichen Pausen.",
+    "ECHTE GESPRÄCHE. Dialoge und Rollenspiele.",
+    "Dialog öffnen, beide Rollen anhören und jedes deutsche Wort einzeln übersetzen oder aussprechen lassen.",
+    "Beide Rollen laut sprechen und danach die Rollen tauschen.",
+    "Sprich beide Rollen laut und ersetze anschließend einzelne Angaben mit deinen eigenen Beispielen.",
   ];
   const missing = new Set<string>();
   for (const text of texts) {

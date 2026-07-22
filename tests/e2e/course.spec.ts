@@ -40,12 +40,24 @@ test("filters have useful accessible names", async ({ page }) => {
 });
 
 test("Arabic stays hidden until translation is requested", async ({ page }) => {
-  for (const section of ["home", "questions", "vocabulary"]) {
+  for (const section of ["home", "questions", "vocabulary", "situations"]) {
     await page.goto(`/#${section}`);
     const visibleText = await page.locator("body").innerText();
     expect(visibleText).not.toMatch(/[\u0600-\u06ff]/u);
     await expect(page.locator('[data-translation-status="missing"]')).toHaveCount(0);
   }
+});
+
+test("dialogues keep both roles interactive and shareable", async ({ page }) => {
+  await page.goto("/#situations");
+  await expect(page.getByRole("heading", { name: "Dialoge und Rollenspiele", exact: true })).toBeVisible();
+  await expect(page.locator(".scenario-card")).toHaveCount(8);
+  await expect(page.locator(".scenario-card.open .dialogue > div")).toHaveCount(4);
+  await page.locator(".scenario-card.open .dialogue .touch-word").nth(1).click();
+  await page.getByRole("button", { name: "Übersetzen", exact: true }).click();
+  await expect(page.locator(".word-translation")).toBeVisible();
+  await page.reload();
+  await expect(page.getByRole("heading", { name: "Dialoge und Rollenspiele", exact: true })).toBeVisible();
 });
 
 test("light design can be selected and is remembered", async ({ page }) => {

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 const title = "Borussia Deutsch Akademie | Interview & Kundenservice";
-const description = "Interaktiver Deutschkurs für Bewerbungsgespräche und Kundenservice mit Interviewfragen, flexiblen Musterantworten, Wortschatz und deutscher Aussprache.";
+const description = "Interaktiver Deutschkurs für Bewerbungsgespräche und Kundenservice mit Interviewfragen, flexiblen Musterantworten, Wortschatz, Dialogen und deutscher Aussprache.";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://bvb-deutsch-akademie.vercel.app"),

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { questions, vocabulary } from "../app/course-data";
+import { questions, scenarios, vocabulary } from "../app/course-data";
 
 test("question bank is complete and stable", () => {
   assert.equal(questions.length, 55);
@@ -27,5 +27,14 @@ test("every vocabulary item has unique word-specific practice", () => {
     assert.ok(item.word && item.arabic && item.type && item.category);
     assert.ok(item.exampleDe.includes(item.word), `${item.word} missing from its example`);
     assert.ok(item.situationDe.includes(item.word), `${item.word} missing from its situation`);
+  }
+});
+
+test("all original dialogues are available with both roles", () => {
+  assert.equal(scenarios.length, 8);
+  for (const scenario of scenarios) {
+    assert.equal(scenario.lines.length, 4, `${scenario.titleDe} must have four lines`);
+    assert.ok(scenario.lines.some((line) => line.speaker === "Kunde"));
+    assert.ok(scenario.lines.some((line) => line.speaker === "Mitarbeiter"));
   }
 });

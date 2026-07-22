@@ -1,15 +1,16 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { questions, vocabulary, type Vocabulary } from "./course-data";
+import { questions, scenarios, vocabulary, type Vocabulary } from "./course-data";
 
-type Section = "home" | "questions" | "vocabulary";
+type Section = "home" | "questions" | "vocabulary" | "situations";
 type Theme = "dark" | "light";
 
 const nav: { id: Section; label: string; de: string; icon: string }[] = [
   { id: "home", label: "Startseite", de: "Überblick", icon: "⌂" },
   { id: "questions", label: "Fragen", de: "Interview", icon: "?" },
   { id: "vocabulary", label: "Wortschatz", de: "Wörter", icon: "Aa" },
+  { id: "situations", label: "Dialoge", de: "Rollenspiele", icon: "◌" },
 ];
 
 const questionCategories = ["ALLE", ...Array.from(new Set(questions.map((item) => item.category)))];
@@ -18,11 +19,11 @@ const categoryNames: Record<string, string> = {
   "التعريف بالنفس": "Vorstellung", "التعريف بالنفس · 3 دقائق": "Vorstellung · 3 Minuten", "الدافع": "Motivation", "الشركة": "Unternehmen",
   "الخبرة": "Erfahrung", "خدمة العملاء": "Kundenservice", "الضغط": "Stress", "نقاط القوة": "Stärken", "نقاط الضعف": "Schwächen",
   "الفريق": "Teamarbeit", "المستقبل": "Zukunft", "مواقف": "Situationen", "طلبات وشحن": "Bestellung & Versand", "مدفوعات": "Zahlungen",
-  "التقنية": "Technik", "الوصف": "Beschreibung", "ألمانيا": "Deutschland", "قيم العمل": "Arbeitswerte", "أسئلة مفاجئة": "Überraschungsfragen",
+  "التقنية": "Technik", "تقنية": "Technik", "الوصف": "Beschreibung", "ألمانيا": "Deutschland", "قيم العمل": "Arbeitswerte", "أسئلة مفاجئة": "Überraschungsfragen",
   "المقابلة": "Interview", "عام": "Allgemein", "أساسيات": "Grundlagen", "شحن": "Versand", "قواعد": "Grammatik", "تواصل": "Kommunikation",
   "الطلبات والشحن": "Bestellungen & Versand", "الإرجاع والاستبدال": "Retoure & Umtausch", "الدفع والفواتير": "Zahlung & Rechnung",
   "الهاتف والدعم التقني": "Telefon & Technik", "المقابلة والعمل": "Interview & Arbeit", "B2 والحياة اليومية": "B2 & Alltag",
-  "المستوى B2": "B2-Niveau",
+  "المستوى B2": "B2-Niveau", "الشحن": "Versand", "الدفع": "Zahlung", "الإرجاع": "Retoure", "عميل صعب": "Schwierige Kunden",
 };
 const categoryName = (value: string) => value === "ALLE" ? "Alle Kategorien" : (categoryNames[value] ?? "Kursthema");
 
@@ -124,6 +125,11 @@ const coreLexicon: Record<string, string> = {
   a: "البداية / الأساس", o: "النهاية / كل شيء", aktivitäten: "أنشطة", ausgleich: "توازن", bereich: "مجال", englisch: "الإنجليزية", fußball: "كرة القدم", hobbys: "هوايات", neben: "بجانب", rückhalt: "دعم وسند", spaziergänge: "نزهات", sprachkenntnisse: "مهارات اللغة", zurzeit: "حاليًا", land: "البلد", studienfach: "التخصص الدراسي",
   abgeschlossen: "أنهى", aktiv: "نشيط", dort: "هناك", einkaufen: "يتسوّق", gehe: "أذهب", gesammelt: "اكتسب", niemand: "لا أحد", perfekt: "مثالي", spiele: "ألعب", stamme: "أنحدر", studiert: "درس", ursprünglich: "في الأصل", verschiedene: "متنوعة", weniger: "أقل", zuhöre: "أستمع",
   eckigen: "المربعة", klammern: "أقواس", sprich: "تكلّم", pausen: "وقفات",
+  "458732": "٤٥٨٧٣٢", "778899": "٧٧٨٨٩٩", beleidigender: "مسيء", dialog: "حوار", dialoge: "حوارات", echte: "حقيقية",
+  entschuldigung: "اعتذار", geld: "مال", hemd: "قميص", "it-abteilung": "قسم تقنية المعلومات", karton: "صندوق كرتون", nein: "لا", paypal: "باي بال", produkt: "منتج", werktage: "أيام عمل", woche: "أسبوع",
+  bestellt: "طلب", bezahlen: "يدفع", beziehungsweise: "أو", bis: "حتى", blaues: "أزرق", eigenen: "الخاصة بك", einzeln: "بشكل منفرد", einzelne: "منفردة", endlich: "أخيرًا", erneut: "مجدّدًا", genutzt: "استخدم",
+  gestern: "أمس", kommt: "يصل", komplette: "كاملة", kostenlos: "مجاني", laut: "بصوت عالٍ", leid: "آسف", leider: "للأسف", liegt: "يرجع سببه", morgen: "غدًا", normalerweise: "عادةً", per: "عن طريق", rotes: "أحمر", sieben: "سبعة",
+  sollte: "كان من المفترض", tut: "يفعل", unfähig: "غير كفؤ", verfügbar: "متاح", vorliegt: "موجود", völlig: "تمامًا", wieder: "مرة أخرى",
 };
 
 const vocabularyTokenTranslations = new Map<string, string>();
@@ -309,7 +315,7 @@ export default function Home() {
   useEffect(() => {
     const syncSection = () => {
       const requested = window.location.hash.slice(1) as Section;
-      setSection(["home", "questions", "vocabulary"].includes(requested) ? requested : "home");
+      setSection(["home", "questions", "vocabulary", "situations"].includes(requested) ? requested : "home");
     };
     syncSection();
     window.addEventListener("popstate", syncSection);
@@ -342,7 +348,8 @@ export default function Home() {
       {section === "home" && <HomeSection onNavigate={changeSection} />}
       {section === "questions" && <QuestionsSection />}
       {section === "vocabulary" && <VocabularySection onSelect={setSelectedWord} />}
-      <footer><span className="flag-line" /><p><GermanText>Borussia Deutsch Akademie · Fragen und Wortschatz</GermanText></p></footer>
+      {section === "situations" && <DialoguesSection />}
+      <footer><span className="flag-line" /><p><GermanText>Borussia Deutsch Akademie · Fragen, Wortschatz und Dialoge</GermanText></p></footer>
       <nav className="mobile-bottom-nav compact-nav" aria-label="Schnellnavigation">{nav.map((item) => <button key={item.id} className={section === item.id ? "active" : ""} onClick={() => changeSection(item.id)}><span>{item.icon}</span><small>{item.label}</small></button>)}</nav>
     </main>
     {selectedWord && <WordModal word={selectedWord} onClose={() => setSelectedWord(null)} />}
@@ -352,9 +359,9 @@ export default function Home() {
 
 function HomeSection({ onNavigate }: { onNavigate: (section: Section) => void }) {
   return <div className="page home-page">
-    <section className="hero simplified-hero"><div className="hero-copy"><div className="eyebrow"><i /> <GermanText>DEIN INTERVIEW-TRAINING</GermanText></div><h1><GermanText>Fragen verstehen.</GermanText><br/><em><GermanText>Wörter beherrschen.</GermanText></em></h1><p><GermanText>Konzentriertes Deutschtraining mit Interviewfragen, flexiblen Musterantworten und interaktivem Wortschatz.</GermanText></p><div className="hero-actions"><button className="primary-button" onClick={() => onNavigate("questions")}>Fragen öffnen <span>←</span></button><button className="ghost-button" onClick={() => onNavigate("vocabulary")}>Wortschatz öffnen</button></div><div className="hero-note"><GermanText>Jedes Lernwort bietet zwei Optionen: Übersetzen oder auf Deutsch anhören.</GermanText></div></div><div className="hero-visual"><div className="stadium-lines" aria-hidden="true"/><div className="hero-score"><small><GermanText>DEUTSCH</GermanText></small><strong>B2</strong><span><GermanText>BEREIT FÜRS INTERVIEW</GermanText></span></div><div className="german-bars" aria-hidden="true"><i/><i/><i/></div></div></section>
-    <section className="stats-grid two-stats"><div><strong>{questions.length}</strong><span><GermanText>Fragen mit Antworten</GermanText></span><small><GermanText>INTERVIEWFRAGEN</GermanText></small></div><div><strong>{vocabulary.length}</strong><span><GermanText>Interaktive Wörter</GermanText></span><small><GermanText>WORTSCHATZ</GermanText></small></div></section>
-    <section className="focus-grid"><button onClick={() => onNavigate("questions")}><span>?</span><div><small>FRAGENBANK</small><h2>Interviewfragen trainieren</h2><p>Antworten öffnen, jedes Wort einzeln übersetzen oder anhören.</p></div><b>←</b></button><button onClick={() => onNavigate("vocabulary")}><span>Aa</span><div><small>WORTSCHATZ</small><h2>Wörter sicher lernen</h2><p>Bedeutung, Beispiel und echte Gesprächssituation.</p></div><b>←</b></button></section>
+    <section className="hero simplified-hero"><div className="hero-copy"><div className="eyebrow"><i /> <GermanText>DEIN INTERVIEW-TRAINING</GermanText></div><h1><GermanText>Fragen verstehen.</GermanText><br/><em><GermanText>Wörter beherrschen.</GermanText></em></h1><p><GermanText>Konzentriertes Deutschtraining mit Interviewfragen, flexiblen Musterantworten, interaktivem Wortschatz und echten Dialogen.</GermanText></p><div className="hero-actions"><button className="primary-button" onClick={() => onNavigate("questions")}>Fragen öffnen <span>←</span></button><button className="ghost-button" onClick={() => onNavigate("situations")}>Dialoge öffnen</button></div><div className="hero-note"><GermanText>Jedes Lernwort bietet zwei Optionen: Übersetzen oder auf Deutsch anhören.</GermanText></div></div><div className="hero-visual"><div className="stadium-lines" aria-hidden="true"/><div className="hero-score"><small><GermanText>DEUTSCH</GermanText></small><strong>B2</strong><span><GermanText>BEREIT FÜRS INTERVIEW</GermanText></span></div><div className="german-bars" aria-hidden="true"><i/><i/><i/></div></div></section>
+    <section className="stats-grid"><div><strong>{questions.length}</strong><span><GermanText>Fragen mit Antworten</GermanText></span><small><GermanText>INTERVIEWFRAGEN</GermanText></small></div><div><strong>{vocabulary.length}</strong><span><GermanText>Interaktive Wörter</GermanText></span><small><GermanText>WORTSCHATZ</GermanText></small></div><div><strong>{scenarios.length}</strong><span><GermanText>Komplette Dialoge</GermanText></span><small><GermanText>ROLLENSPIELE</GermanText></small></div></section>
+    <section className="focus-grid"><button onClick={() => onNavigate("questions")}><span>?</span><div><small>FRAGENBANK</small><h2>Interviewfragen trainieren</h2><p>Antworten öffnen, jedes Wort einzeln übersetzen oder anhören.</p></div><b>←</b></button><button onClick={() => onNavigate("vocabulary")}><span>Aa</span><div><small>WORTSCHATZ</small><h2>Wörter sicher lernen</h2><p>Bedeutung, Beispiel und echte Gesprächssituation.</p></div><b>←</b></button><button onClick={() => onNavigate("situations")}><span>◌</span><div><small>DIALOGE</small><h2>Rollenspiele üben</h2><p>Kunde und Mitarbeiter sprechen, verstehen und anhören.</p></div><b>←</b></button></section>
   </div>;
 }
 
@@ -384,6 +391,16 @@ function VocabularySection({ onSelect }: { onSelect: (word: Vocabulary) => void 
   return <div className="page"><PageIntro kicker="DEIN WORTSCHATZ" title="Kurswörterbuch" text="Wort antippen und zwischen Übersetzen und Anhören wählen. Details öffnen für Beispiel und Gesprächssituation." count={`${filtered.length}`} />
     <div className="filter-bar"><label className="search-field"><span aria-hidden="true">⌕</span><span className="sr-only">Wortschatz durchsuchen</span><input aria-label="Wortschatz durchsuchen" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Wort suchen..." /></label><label className="select-field"><span className="sr-only">Wortkategorie</span><select aria-label="Wortkategorie" value={category} onChange={(event) => setCategory(event.target.value)}>{vocabCategories.map((item) => <option key={item} value={item}>{categoryName(item)}</option>)}</select></label></div>
     <div className="vocab-grid">{filtered.map((word) => <article key={word.id} className="word-card"><span>{word.type}</span><h2 className="de" dir="ltr"><GermanText>{word.word}</GermanText></h2><button className="word-details-button" onClick={() => onSelect(word)}>Details öffnen ←</button></article>)}</div>
+  </div>;
+}
+
+function DialoguesSection() {
+  const [open, setOpen] = useState<number | null>(1);
+  return <div className="page"><PageIntro kicker="ECHTE GESPRÄCHE" title="Dialoge und Rollenspiele" text="Dialog öffnen, beide Rollen anhören und jedes deutsche Wort einzeln übersetzen oder aussprechen lassen." count={`${scenarios.length}`} />
+    <div className="scenario-list">{scenarios.map((scenario) => <article key={scenario.id} className={`scenario-card ${open === scenario.id ? "open" : ""}`}>
+      <div className="scenario-title"><span>{String(scenario.id).padStart(2,"0")}</span><div><small><GermanText>{categoryName(scenario.category)}</GermanText></small><h2 className="de" dir="ltr"><GermanText>{scenario.titleDe}</GermanText></h2></div><button className="expand-button" onClick={() => setOpen(open === scenario.id ? null : scenario.id)} aria-expanded={open === scenario.id} aria-controls={`dialog-${scenario.id}`} aria-label={open === scenario.id ? "Dialog schließen" : "Dialog öffnen"}>{open === scenario.id ? "−" : "+"}</button></div>
+      {open === scenario.id && <div className="scenario-body" id={`dialog-${scenario.id}`}><div className="scenario-toolbar"><AudioButton text={scenario.lines.map((line) => `${line.speaker}: ${line.de}`).join(" ")} label="Ganzen Dialog anhören"/><small><GermanText>Beide Rollen laut sprechen und danach die Rollen tauschen.</GermanText></small></div><div className="dialogue">{scenario.lines.map((line, index) => <div key={index} className={line.speaker === "Kunde" ? "customer-line" : "agent-line"}><span aria-hidden="true">{line.speaker === "Kunde" ? "K" : "M"}</span><div><small><GermanText>{line.speaker}</GermanText></small><p className="de" dir="ltr"><GermanText>{line.de}</GermanText></p></div><AudioButton text={line.de} label={`${line.speaker} anhören`}/></div>)}</div><div className="personalize-tip"><span>!</span><p><GermanText>Sprich beide Rollen laut und ersetze anschließend einzelne Angaben mit deinen eigenen Beispielen.</GermanText></p></div></div>}
+    </article>)}</div>
   </div>;
 }
 
