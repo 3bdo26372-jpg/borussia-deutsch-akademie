@@ -36,6 +36,7 @@ test("every learning-content token has an Arabic meaning", () => {
     "Wort antippen: Übersetzen oder mit deutscher Stimme anhören.",
     "Fragen mit Antworten. Interaktive Wörter. Interviewfragen. Wortschatz.",
     "Borussia Deutsch Akademie. Fragen und Wortschatz.",
+    "Personalisieren: Ersetze nur Angaben in eckigen Klammern und sprich mit natürlichen Pausen.",
   ];
   const missing = new Set<string>();
   for (const text of texts) {
