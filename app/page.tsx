@@ -120,6 +120,8 @@ const coreLexicon: Record<string, string> = {
   antippen: "يلمس / ينقر", dein: "خاصّتك",
   akademie: "أكاديمية", borussia: "بوروسيا", interaktive: "تفاعلية",
   übersetzung: "ترجمة", gilt: "تنطبق", ausgewählte: "المختارة", vorstellung: "تقديم النفس", beschreibung: "وصف", "b1": "المستوى B1", "b2": "المستوى B2",
+  a: "البداية / الأساس", o: "النهاية / كل شيء", aktivitäten: "أنشطة", ausgleich: "توازن", bereich: "مجال", englisch: "الإنجليزية", fußball: "كرة القدم", hobbys: "هوايات", neben: "بجانب", rückhalt: "دعم وسند", spaziergänge: "نزهات", sprachkenntnisse: "مهارات اللغة", zurzeit: "حاليًا", land: "البلد", studienfach: "التخصص الدراسي",
+  abgeschlossen: "أنهى", aktiv: "نشيط", dort: "هناك", einkaufen: "يتسوّق", gehe: "أذهب", gesammelt: "اكتسب", niemand: "لا أحد", perfekt: "مثالي", spiele: "ألعب", stamme: "أنحدر", studiert: "درس", ursprünglich: "في الأصل", verschiedene: "متنوعة", weniger: "أقل", zuhöre: "أستمع",
 };
 
 const vocabularyTokenTranslations = new Map<string, string>();
