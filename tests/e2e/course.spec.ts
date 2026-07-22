@@ -48,6 +48,16 @@ test("Arabic stays hidden until translation is requested", async ({ page }) => {
   }
 });
 
+test("light design can be selected and is remembered", async ({ page }) => {
+  await page.goto("/#home");
+  await page.getByRole("button", { name: "Helles Design aktivieren" }).click();
+  await expect(page.locator(".app-shell")).toHaveAttribute("data-theme", "light");
+  await expect(page.getByRole("button", { name: "Dunkles Design aktivieren" })).toBeVisible();
+  await expect(page.locator(".app-shell")).toHaveCSS("background-color", "rgb(244, 241, 232)");
+  await page.reload();
+  await expect(page.locator(".app-shell")).toHaveAttribute("data-theme", "light");
+});
+
 test("word details are an accessible modal", async ({ page }) => {
   await page.goto("/#vocabulary");
   await page.getByRole("button", { name: /Details öffnen/ }).first().click();

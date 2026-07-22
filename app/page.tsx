@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { questions, vocabulary, type Vocabulary } from "./course-data";
 
 type Section = "home" | "questions" | "vocabulary";
+type Theme = "dark" | "light";
 
 const nav: { id: Section; label: string; de: string; icon: string }[] = [
   { id: "home", label: "Startseite", de: "Überblick", icon: "⌂" },
@@ -285,6 +286,7 @@ function WordAssistant() {
 
 export default function Home() {
   const [section, setSection] = useState<Section>("home");
+  const [theme, setTheme] = useState<Theme>("dark");
   const [menuOpen, setMenuOpen] = useState(false);
   const [selectedWord, setSelectedWord] = useState<Vocabulary | null>(null);
   const changeSection = useCallback((next: Section, historyMode: "push" | "replace" = "push") => {
@@ -294,6 +296,14 @@ export default function Home() {
     window.history[historyMode === "push" ? "pushState" : "replaceState"]({}, "", url);
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     window.scrollTo({ top: 0, behavior: reducedMotion ? "auto" : "smooth" });
+  }, []);
+
+  useEffect(() => {
+    const savedTheme = window.localStorage.getItem("bda-theme");
+    const initialTheme: Theme = savedTheme === "light" ? "light" : "dark";
+    document.documentElement.dataset.theme = initialTheme;
+    const frame = window.requestAnimationFrame(() => setTheme(initialTheme));
+    return () => window.cancelAnimationFrame(frame);
   }, []);
 
   useEffect(() => {
@@ -310,7 +320,16 @@ export default function Home() {
     };
   }, []);
 
-  return <div className="app-shell" dir="ltr">
+  const toggleTheme = () => {
+    setTheme((currentTheme) => {
+      const nextTheme: Theme = currentTheme === "dark" ? "light" : "dark";
+      window.localStorage.setItem("bda-theme", nextTheme);
+      document.documentElement.dataset.theme = nextTheme;
+      return nextTheme;
+    });
+  };
+
+  return <div className="app-shell" data-theme={theme} dir="ltr">
     <aside className={`sidebar ${menuOpen ? "sidebar-open" : ""}`}>
       <button className="close-menu" onClick={() => setMenuOpen(false)} aria-label="Menü schließen">×</button>
       <div className="brand-block"><div className="brand-mark"><span>B</span><b>DA</b></div><div><strong>BORUSSIA</strong><small>DEUTSCH AKADEMIE</small></div></div>
@@ -319,7 +338,7 @@ export default function Home() {
     </aside>
     {menuOpen && <button className="menu-backdrop" onClick={() => setMenuOpen(false)} aria-label="Schließen" />}
     <main className="main-content">
-      <header className="topbar"><button className="menu-button" onClick={() => setMenuOpen(true)} aria-label="Menü öffnen">☰</button><div className="mobile-brand"><span>BDA</span><b>Deutsch Akademie</b></div><div className="topbar-actions"><span className="level-pill">B1 → B2</span><button className="search-jump" onClick={() => changeSection("vocabulary")}>⌕ <span>Wortschatz durchsuchen</span></button></div></header>
+      <header className="topbar"><button className="menu-button" onClick={() => setMenuOpen(true)} aria-label="Menü öffnen">☰</button><div className="mobile-brand"><span>BDA</span><b>Deutsch Akademie</b></div><div className="topbar-actions"><button className="theme-toggle" onClick={toggleTheme} aria-label={theme === "dark" ? "Helles Design aktivieren" : "Dunkles Design aktivieren"} title={theme === "dark" ? "Helles Design" : "Dunkles Design"}><span aria-hidden="true">{theme === "dark" ? "☀" : "☾"}</span><b>{theme === "dark" ? "Hell" : "Dunkel"}</b></button><span className="level-pill">B1 → B2</span><button className="search-jump" onClick={() => changeSection("vocabulary")}>⌕ <span>Wortschatz durchsuchen</span></button></div></header>
       {section === "home" && <HomeSection onNavigate={changeSection} />}
       {section === "questions" && <QuestionsSection />}
       {section === "vocabulary" && <VocabularySection onSelect={setSelectedWord} />}
